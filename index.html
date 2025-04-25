@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simple Chat Interface</title>
+    <!-- Add marked.js for Markdown parsing -->
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <!-- Link to external CSS file -->
+    <link rel="stylesheet" href="style.css">
+    <!-- Link to external JavaScript file -->
+    <script src="script.js"></script>
+</head>
+<body>
+    <div class="chat-container">
+        <div class="chat-header">
+            Andi's Bot
+        </div>
+        <div class="chat-messages" id="chat-messages">
+            <div class="message bot-message">
+                Linked to n8n MPC server.
+            </div>
+        </div>
+        <div class="typing-indicator" id="typing-indicator">
+            Bot is thinking...
+        </div>
+        <div class="chat-input">
+            <input type="text" id="message-input" placeholder="Type your message here..." autocomplete="off">
+            <button id="send-button">Send</button>
+        </div>
+    </div>
+</body>
+</html> 

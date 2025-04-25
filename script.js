@@ -1,0 +1,138 @@
+document.addEventListener('DOMContentLoaded', function() {
+    const messageInput = document.getElementById('message-input');
+    const sendButton = document.getElementById('send-button');
+    const chatMessages = document.getElementById('chat-messages');
+    const typingIndicator = document.getElementById('typing-indicator');
+    
+    // Generate a unique sessionId for this chat session
+    const sessionId = 'session_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+    console.log('Generated sessionId:', sessionId);
+    
+    // Function to add a message to the chat
+    function addMessage(message, isUser) {
+        const messageElement = document.createElement('div');
+        messageElement.classList.add('message');
+        messageElement.classList.add(isUser ? 'user-message' : 'bot-message');
+        
+        if (isUser) {
+            // User messages are displayed as plain text
+            messageElement.textContent = message;
+        } else {
+            // Bot messages are rendered as Markdown
+            try {
+                // Use marked.js to parse markdown
+                messageElement.innerHTML = marked.parse(message);
+            } catch (e) {
+                console.error('Error parsing markdown:', e);
+                // Fallback to simple newline handling if markdown parsing fails
+                messageElement.innerHTML = message.replace(/\n/g, '<br>');
+            }
+        }
+        
+        chatMessages.appendChild(messageElement);
+        chatMessages.scrollTop = chatMessages.scrollHeight;
+    }
+    
+    // Function to send a message to the bot
+    async function sendMessage(message) {
+        // Add user message to chat
+        addMessage(message, true);
+        
+        // Clear input field
+        messageInput.value = '';
+        
+        // Show typing indicator
+        typingIndicator.style.display = 'block';
+        
+        try {
+            // Include the sessionId in the payload
+            const payload = { 
+                chatInput: message,
+                sessionId: sessionId  // Add the sessionId as required by the webhook
+            };
+            
+            console.log('Sending payload:', payload);
+            
+            // Send message to API
+            const response = await fetch('https://n8n.ernilabs.com/webhook/e9fbf640-cc4d-4ac1-90c7-1a447b697d6c/chat', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json'
+                },
+                body: JSON.stringify(payload)
+            });
+            
+            // Get the raw text response first
+            const responseText = await response.text();
+            console.log('API Raw Response:', responseText);
+            
+            let data;
+            // Try to parse as JSON, if not, use as plain text
+            try {
+                data = JSON.parse(responseText);
+                console.log('API Parsed Response:', data);
+            } catch (e) {
+                console.log('Response is not JSON, using as plain text');
+                data = { text: responseText };
+            }
+            
+            // Hide typing indicator
+            typingIndicator.style.display = 'none';
+            
+            // Process the response
+            if (data && data.output) {
+                // The webhook returns JSON with an 'output' field
+                addMessage(data.output, false);
+            } else if (data && data.text) {
+                addMessage(data.text, false);
+            } else if (data && data.response) {
+                addMessage(data.response, false);
+            } else if (typeof responseText === 'string' && responseText.trim() !== '') {
+                // Try to parse the raw text as JSON one more time
+                // (in case we're getting double-encoded JSON)
+                try {
+                    const jsonAttempt = JSON.parse(responseText);
+                    if (jsonAttempt && jsonAttempt.output) {
+                        addMessage(jsonAttempt.output, false);
+                    } else {
+                        addMessage(responseText, false);
+                    }
+                } catch (e) {
+                    addMessage(responseText, false);
+                }
+            } else {
+                addMessage('Received an empty or invalid response from the webhook.', false);
+            }
+            
+        } catch (error) {
+            console.error('Error:', error);
+            
+            // Hide typing indicator
+            typingIndicator.style.display = 'none';
+            
+            // Add more detailed error message
+            addMessage(`Error communicating with the webhook: ${error.message}`, false);
+        }
+    }
+    
+    // Event listeners
+    sendButton.addEventListener('click', function() {
+        const message = messageInput.value.trim();
+        if (message) {
+            sendMessage(message);
+        }
+    });
+    
+    messageInput.addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') {
+            const message = messageInput.value.trim();
+            if (message) {
+                sendMessage(message);
+            }
+        }
+    });
+    
+    // Focus input field when page loads
+    messageInput.focus();
+}); 
