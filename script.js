@@ -3,6 +3,40 @@ document.addEventListener('DOMContentLoaded', function() {
     const sendButton = document.getElementById('send-button');
     const chatMessages = document.getElementById('chat-messages');
     const typingIndicator = document.getElementById('typing-indicator');
+    const fullscreenBtn = document.getElementById('fullscreen-btn');
+    const chatContainer = document.querySelector('.chat-container');
+    const fullscreenIcon = fullscreenBtn.querySelector('i');
+    
+    // Fullscreen toggle functionality
+    let isFullscreen = false;
+    
+    fullscreenBtn.addEventListener('click', function() {
+        isFullscreen = !isFullscreen;
+        
+        if (isFullscreen) {
+            // Enter fullscreen mode
+            chatContainer.classList.add('fullscreen-chat');
+            fullscreenIcon.classList.remove('fa-expand');
+            fullscreenIcon.classList.add('fa-compress');
+            fullscreenBtn.title = "Exit fullscreen";
+        } else {
+            // Exit fullscreen mode
+            chatContainer.classList.remove('fullscreen-chat');
+            fullscreenIcon.classList.remove('fa-compress');
+            fullscreenIcon.classList.add('fa-expand');
+            fullscreenBtn.title = "Enter fullscreen";
+        }
+        
+        // Focus back on input after toggling
+        setTimeout(() => messageInput.focus(), 100);
+    });
+    
+    // Listen for Escape key to exit fullscreen
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape' && isFullscreen) {
+            fullscreenBtn.click();
+        }
+    });
     
     // Generate a unique sessionId for this chat session
     const sessionId = 'session_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
