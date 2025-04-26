@@ -30,6 +30,9 @@ if (!isset($_SESSION['authenticated']) || $_SESSION['authenticated'] !== true) {
             <button id="clear-chat-btn" class="clear-chat-btn" title="Clear chat history">
                 <i class="fas fa-trash"></i>
             </button>
+            <button id="dark-mode-btn" class="dark-mode-btn" title="Toggle dark mode">
+                <i class="fas fa-moon"></i>
+            </button>
             Andi's Bot
             <button id="fullscreen-btn" class="fullscreen-btn" title="Toggle fullscreen">
                 <i class="fas fa-expand"></i>

@@ -4,10 +4,83 @@ document.addEventListener('DOMContentLoaded', function() {
     const chatMessages = document.getElementById('chat-messages');
     const fullscreenBtn = document.getElementById('fullscreen-btn');
     const clearChatBtn = document.getElementById('clear-chat-btn');
+    const darkModeBtn = document.getElementById('dark-mode-btn');
+    const darkModeIcon = darkModeBtn.querySelector('i');
     const chatContainer = document.querySelector('.chat-container');
     const fullscreenIcon = fullscreenBtn.querySelector('i');
     const micButton = document.getElementById('mic-button');
     const micIcon = micButton.querySelector('i');
+    
+    // Dark mode functionality
+    let isDarkMode = localStorage.getItem('darkMode') === 'true';
+    
+    // Function to load dark mode stylesheet
+    function loadDarkModeStylesheet(load) {
+        const darkModeStylesheet = document.getElementById('dark-mode-stylesheet');
+        
+        if (load) {
+            if (!darkModeStylesheet) {
+                const link = document.createElement('link');
+                link.id = 'dark-mode-stylesheet';
+                link.rel = 'stylesheet';
+                link.href = 'dark-mode.css';
+                document.head.appendChild(link);
+                console.log('Dark mode stylesheet loaded');
+            }
+        } else {
+            if (darkModeStylesheet) {
+                darkModeStylesheet.remove();
+                console.log('Dark mode stylesheet removed');
+            }
+        }
+    }
+    
+    // Apply saved dark mode preference on page load
+    if (isDarkMode) {
+        document.body.classList.add('dark-mode');
+        darkModeIcon.classList.remove('fa-moon');
+        darkModeIcon.classList.add('fa-sun');
+        darkModeBtn.title = "Switch to light mode";
+        loadDarkModeStylesheet(true);
+        
+        // Apply dark mode styles directly to buttons on page load
+        sendButton.style.backgroundColor = "#1e5bb9";
+        micButton.style.backgroundColor = "#2e7d32";
+    }
+    
+    // Toggle dark mode when button is clicked
+    darkModeBtn.addEventListener('click', function() {
+        isDarkMode = !isDarkMode;
+        
+        if (isDarkMode) {
+            // Enable dark mode
+            document.body.classList.add('dark-mode');
+            darkModeIcon.classList.remove('fa-moon');
+            darkModeIcon.classList.add('fa-sun');
+            darkModeBtn.title = "Switch to light mode";
+            loadDarkModeStylesheet(true);
+            console.log('Dark mode enabled');
+            
+            // Apply dark mode styles directly to buttons
+            sendButton.style.backgroundColor = "#1e5bb9";
+            micButton.style.backgroundColor = "#2e7d32";
+        } else {
+            // Disable dark mode
+            document.body.classList.remove('dark-mode');
+            darkModeIcon.classList.remove('fa-sun');
+            darkModeIcon.classList.add('fa-moon');
+            darkModeBtn.title = "Switch to dark mode";
+            loadDarkModeStylesheet(false);
+            console.log('Dark mode disabled');
+            
+            // Reset button styles to defaults
+            sendButton.style.backgroundColor = "";
+            micButton.style.backgroundColor = "";
+        }
+        
+        // Save preference to localStorage
+        localStorage.setItem('darkMode', isDarkMode);
+    });
     
     // Speech recognition setup
     let recognition = null;
