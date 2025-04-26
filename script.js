@@ -105,13 +105,14 @@ document.addEventListener('DOMContentLoaded', function() {
             // Include the sessionId in the payload
             const payload = { 
                 chatInput: message,
-                sessionId: sessionId  // Add the sessionId as required by the webhook
+                sessionId: sessionId
             };
             
             console.log('Sending payload:', payload);
             
-            // Send message to API
-            const response = await fetch('https://n8n.ernilabs.com/webhook/e9fbf640-cc4d-4ac1-90c7-1a447b697d6c/chat', {
+            // Send message to PHP proxy instead of directly to n8n
+            // The proxy handles authentication securely
+            const response = await fetch('proxy.php', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',

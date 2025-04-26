@@ -1,0 +1,6 @@
+# Ignore sensitive configuration
+proxy.php
+
+# Ignore environment files
+.env
+*.env
