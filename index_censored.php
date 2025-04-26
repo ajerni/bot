@@ -71,7 +71,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         }
         
         .twinkle {
-            animation: twinkle 4s infinite;
+            animation: twinkle 2s infinite;
         }
         
         @keyframes twinkle {
@@ -236,7 +236,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         }
         
         .fade-out {
-            animation: fadeOut 1s forwards;
+            animation: fadeOut 0.5s forwards;
         }
         
         @keyframes fadeOut {
