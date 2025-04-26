@@ -62,7 +62,22 @@ body {
     transition: background-color 0.2s;
 }
 
-.fullscreen-btn:hover {
+.clear-chat-btn {
+    position: absolute;
+    top: 50%;
+    left: 15px;
+    transform: translateY(-50%);
+    background: none;
+    border: none;
+    color: white;
+    font-size: 16px;
+    cursor: pointer;
+    padding: 5px;
+    border-radius: 4px;
+    transition: background-color 0.2s;
+}
+
+.fullscreen-btn:hover, .clear-chat-btn:hover {
     background-color: rgba(255, 255, 255, 0.2);
 }
 
@@ -180,6 +195,54 @@ body {
 .bot-message ul, .bot-message ol {
     margin: 0;
     padding-left: 20px;
+}
+
+/* Add styling for the animated typing dots */
+.typing-dots {
+    display: inline-block;
+}
+
+.typing-dots span {
+    display: inline-block;
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background-color: #555;
+    margin: 0 2px;
+    opacity: 0.3;
+    animation: typingAnimation 1.4s infinite ease-in-out;
+}
+
+.typing-dots span:nth-child(1) {
+    animation-delay: 0s;
+}
+
+.typing-dots span:nth-child(2) {
+    animation-delay: 0.2s;
+}
+
+.typing-dots span:nth-child(3) {
+    animation-delay: 0.4s;
+}
+
+@keyframes typingAnimation {
+    0% {
+        opacity: 0.3;
+        transform: scale(1);
+    }
+    50% {
+        opacity: 1;
+        transform: scale(1.2);
+    }
+    100% {
+        opacity: 0.3;
+        transform: scale(1);
+    }
+}
+
+/* Hide the old typing indicator */
+.typing-indicator {
+    display: none !important;
 }
 
 /* Responsive adjustments */

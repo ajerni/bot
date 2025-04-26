@@ -2,10 +2,21 @@ document.addEventListener('DOMContentLoaded', function() {
     const messageInput = document.getElementById('message-input');
     const sendButton = document.getElementById('send-button');
     const chatMessages = document.getElementById('chat-messages');
-    const typingIndicator = document.getElementById('typing-indicator');
     const fullscreenBtn = document.getElementById('fullscreen-btn');
+    const clearChatBtn = document.getElementById('clear-chat-btn');
     const chatContainer = document.querySelector('.chat-container');
     const fullscreenIcon = fullscreenBtn.querySelector('i');
+    
+    // Clear chat functionality
+    clearChatBtn.addEventListener('click', function() {
+        // Remove all messages except the first welcome message
+        while (chatMessages.childNodes.length > 1) {
+            chatMessages.removeChild(chatMessages.lastChild);
+        }
+        
+        // Focus on the input field after clearing
+        messageInput.focus();
+    });
     
     // Fullscreen toggle functionality
     let isFullscreen = false;
@@ -65,6 +76,18 @@ document.addEventListener('DOMContentLoaded', function() {
         
         chatMessages.appendChild(messageElement);
         chatMessages.scrollTop = chatMessages.scrollHeight;
+        return messageElement;
+    }
+    
+    // Function to show typing animation in a bot message bubble
+    function showTypingAnimation() {
+        // Create typing animation message
+        const typingElement = document.createElement('div');
+        typingElement.classList.add('message', 'bot-message', 'typing-message');
+        typingElement.innerHTML = '<div class="typing-dots"><span></span><span></span><span></span></div>';
+        chatMessages.appendChild(typingElement);
+        chatMessages.scrollTop = chatMessages.scrollHeight;
+        return typingElement;
     }
     
     // Function to send a message to the bot
@@ -75,8 +98,8 @@ document.addEventListener('DOMContentLoaded', function() {
         // Clear input field
         messageInput.value = '';
         
-        // Show typing indicator
-        typingIndicator.style.display = 'block';
+        // Show typing animation in a message bubble
+        const typingElement = showTypingAnimation();
         
         try {
             // Include the sessionId in the payload
@@ -111,8 +134,8 @@ document.addEventListener('DOMContentLoaded', function() {
                 data = { text: responseText };
             }
             
-            // Hide typing indicator
-            typingIndicator.style.display = 'none';
+            // Remove typing animation
+            chatMessages.removeChild(typingElement);
             
             // Process the response
             if (data && data.output) {
@@ -142,8 +165,8 @@ document.addEventListener('DOMContentLoaded', function() {
         } catch (error) {
             console.error('Error:', error);
             
-            // Hide typing indicator
-            typingIndicator.style.display = 'none';
+            // Remove typing animation
+            chatMessages.removeChild(typingElement);
             
             // Add more detailed error message
             addMessage(`Error communicating with the webhook: ${error.message}`, false);

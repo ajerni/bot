@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Simple Chat Interface</title>
+    <title>Andi's Bot</title>
     <!-- Add marked.js for Markdown parsing -->
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
     <!-- Link to external CSS file -->
@@ -16,6 +16,9 @@
 <body>
     <div class="chat-container">
         <div class="chat-header">
+            <button id="clear-chat-btn" class="clear-chat-btn" title="Clear chat history">
+                <i class="fas fa-trash"></i>
+            </button>
             Andi's Bot
             <button id="fullscreen-btn" class="fullscreen-btn" title="Toggle fullscreen">
                 <i class="fas fa-expand"></i>
@@ -25,9 +28,6 @@
             <div class="message bot-message">
                 Linked to n8n MPC server.
             </div>
-        </div>
-        <div class="typing-indicator" id="typing-indicator">
-            Bot is thinking...
         </div>
         <div class="chat-input">
             <input type="text" id="message-input" placeholder="Type your message here..." autocomplete="off">
