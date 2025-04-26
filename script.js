@@ -6,6 +6,72 @@ document.addEventListener('DOMContentLoaded', function() {
     const clearChatBtn = document.getElementById('clear-chat-btn');
     const chatContainer = document.querySelector('.chat-container');
     const fullscreenIcon = fullscreenBtn.querySelector('i');
+    const micButton = document.getElementById('mic-button');
+    const micIcon = micButton.querySelector('i');
+    
+    // Speech recognition setup
+    let recognition = null;
+    let isListening = false;
+    
+    // Check if browser supports speech recognition
+    if ('SpeechRecognition' in window || 'webkitSpeechRecognition' in window) {
+        const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+        recognition = new SpeechRecognition();
+        recognition.continuous = false;
+        recognition.interimResults = false;
+        recognition.lang = 'en-US';
+        
+        recognition.onresult = function(event) {
+            const transcript = event.results[0][0].transcript;
+            messageInput.value = transcript;
+            stopSpeechRecognition();
+        };
+        
+        recognition.onerror = function(event) {
+            console.error('Speech recognition error', event.error);
+            stopSpeechRecognition();
+        };
+        
+        recognition.onend = function() {
+            stopSpeechRecognition();
+        };
+    } else {
+        console.warn('Speech recognition not supported in this browser');
+        micButton.style.display = 'none';
+    }
+    
+    // Function to start speech recognition
+    function startSpeechRecognition() {
+        if (recognition) {
+            recognition.start();
+            isListening = true;
+            micIcon.classList.remove('fa-microphone');
+            micIcon.classList.add('fa-microphone-slash');
+            micButton.classList.add('listening');
+            messageInput.placeholder = "Listening...";
+        }
+    }
+    
+    // Function to stop speech recognition
+    function stopSpeechRecognition() {
+        if (recognition) {
+            recognition.stop();
+            isListening = false;
+            micIcon.classList.remove('fa-microphone-slash');
+            micIcon.classList.add('fa-microphone');
+            micButton.classList.remove('listening');
+            messageInput.placeholder = "Type your message here...";
+        }
+    }
+    
+    // Toggle speech recognition when mic button is clicked
+    micButton.addEventListener('click', function() {
+        if (isListening) {
+            stopSpeechRecognition();
+        } else {
+            startSpeechRecognition();
+        }
+    });
     
     // Clear chat functionality
     clearChatBtn.addEventListener('click', function() {

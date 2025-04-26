@@ -155,8 +155,40 @@ body {
     font-weight: bold;
 }
 
+/* Style for microphone button */
+#mic-button {
+    padding: 10px 12px;
+    background-color: #28a745;
+    transition: background-color 0.3s ease;
+}
+
+#mic-button.listening {
+    background-color: #dc3545;
+    animation: pulse 1.5s infinite;
+}
+
+@keyframes pulse {
+    0% {
+        transform: scale(1);
+    }
+    50% {
+        transform: scale(1.1);
+    }
+    100% {
+        transform: scale(1);
+    }
+}
+
 .chat-input button:hover {
     background-color: #0069d9;
+}
+
+#mic-button:hover {
+    background-color: #218838;
+}
+
+#mic-button.listening:hover {
+    background-color: #c82333;
 }
 
 .typing-indicator {
