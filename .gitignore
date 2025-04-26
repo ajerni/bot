@@ -1,5 +1,6 @@
 # Ignore sensitive configuration
 proxy.php
+index.php
 
 # Ignore environment files
 .env
