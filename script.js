@@ -18,8 +18,14 @@ document.addEventListener('DOMContentLoaded', function() {
         messageInput.focus();
     });
     
-    // Fullscreen toggle functionality
-    let isFullscreen = false;
+    // Set fullscreen on load
+    let isFullscreen = true;
+    
+    // Apply fullscreen on initial load
+    chatContainer.classList.add('fullscreen-chat');
+    fullscreenIcon.classList.remove('fa-expand');
+    fullscreenIcon.classList.add('fa-compress');
+    fullscreenBtn.title = "Exit fullscreen";
     
     fullscreenBtn.addEventListener('click', function() {
         isFullscreen = !isFullscreen;
