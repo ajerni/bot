@@ -96,7 +96,22 @@ body {
     transition: background-color 0.2s;
 }
 
-.dark-mode-btn:hover {
+.favorites-btn {
+    position: absolute;
+    top: 50%;
+    left: 85px;
+    transform: translateY(-50%);
+    background: none;
+    border: none;
+    color: white;
+    font-size: 16px;
+    cursor: pointer;
+    padding: 5px;
+    border-radius: 4px;
+    transition: background-color 0.2s;
+}
+
+.dark-mode-btn:hover, .favorites-btn:hover {
     background-color: rgba(255, 255, 255, 0.2);
 }
 
@@ -379,4 +394,152 @@ body.dark-mode {
 
 .dark-mode .chat-input #mic-button.listening:hover {
     background-color: #bd2130 !important; /* Darker red on hover */
+}
+
+/* Enhanced Modal styles - critical for proper display */
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 9999; /* Higher z-index to ensure modal appears on top */
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background-color: rgba(0, 0, 0, 0.5); /* Slightly darker overlay */
+}
+
+/* Add !important to ensure styles are applied */
+.modal.show {
+    display: block !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+}
+
+.modal-content {
+    background-color: #fefefe;
+    margin: 15% auto;
+    padding: 0;
+    border: 1px solid #888;
+    width: 80%;
+    max-width: 500px;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    animation: modalopen 0.4s;
+    position: relative; /* Ensure proper positioning */
+}
+
+@keyframes modalopen {
+    from {opacity: 0; transform: translateY(-30px);}
+    to {opacity: 1; transform: translateY(0);}
+}
+
+.modal-header {
+    padding: 15px;
+    background-color: #007bff;
+    color: white;
+    border-top-left-radius: 10px;
+    border-top-right-radius: 10px;
+    position: relative;
+}
+
+.modal-header h2 {
+    margin: 0;
+    font-size: 1.2rem;
+}
+
+.close {
+    color: white;
+    position: absolute;
+    right: 15px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 28px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.close:hover,
+.close:focus {
+    color: #f8f8f8;
+    text-decoration: none;
+}
+
+.modal-body {
+    padding: 15px;
+}
+
+#favorites-list {
+    list-style-type: none;
+    padding: 0;
+    margin: 0;
+}
+
+#favorites-list li {
+    padding: 12px 15px;
+    margin-bottom: 8px;
+    background-color: #f1f1f1;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+#favorites-list li:hover {
+    background-color: #e0e0e0;
+}
+
+#favorites-list li:last-child {
+    margin-bottom: 0;
+}
+
+/* Manage favorites button styling */
+#favorites-list li.manage-favorites {
+    background-color: #f8f9fa;
+    border: 1px dashed #ccc;
+    text-align: center;
+    margin-top: 15px;
+    color: #6c757d;
+}
+
+#favorites-list li.manage-favorites:hover {
+    background-color: #e9ecef;
+    color: #495057;
+}
+
+/* Dark mode for modal */
+.dark-mode .modal-content {
+    background-color: #333;
+    border-color: #444;
+}
+
+.dark-mode .modal-header {
+    background-color: #222;
+}
+
+.dark-mode #favorites-list li {
+    background-color: #444;
+    color: #f8f8f8;
+}
+
+.dark-mode #favorites-list li:hover {
+    background-color: #555;
+}
+
+.dark-mode #favorites-list li.manage-favorites {
+    background-color: #343a40;
+    border-color: #495057;
+    color: #adb5bd;
+}
+
+.dark-mode #favorites-list li.manage-favorites:hover {
+    background-color: #212529;
+    color: #e9ecef;
+}
+
+/* Add error styling for favorites list */
+#favorites-list li.error {
+    color: #721c24;
+    background-color: #f8d7da;
+    border: 1px solid #f5c6cb;
+    text-align: center;
 } 
