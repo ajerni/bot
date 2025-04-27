@@ -542,4 +542,54 @@ body.dark-mode {
     background-color: #f8d7da;
     border: 1px solid #f5c6cb;
     text-align: center;
+}
+
+/* Additional styles for favorites list items */
+#favorites-list li.loading-item,
+#favorites-list li.error,
+#favorites-list li.empty-item {
+    text-align: center;
+    padding: 15px;
+    margin-bottom: 0;
+    border-radius: 5px;
+}
+
+#favorites-list li.loading-item {
+    background-color: #f8f9fa;
+    color: #6c757d;
+}
+
+#favorites-list li.loading-item i {
+    margin-right: 8px;
+    animation: spin 1s infinite linear;
+}
+
+#favorites-list li.error {
+    background-color: #f8d7da;
+    color: #721c24;
+    border: 1px solid #f5c6cb;
+}
+
+#favorites-list li.empty-item {
+    background-color: #f8f9fa;
+    color: #6c757d;
+    font-style: italic;
+}
+
+@keyframes spin {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}
+
+/* Dark mode versions */
+.dark-mode #favorites-list li.loading-item,
+.dark-mode #favorites-list li.empty-item {
+    background-color: #343a40;
+    color: #adb5bd;
+}
+
+.dark-mode #favorites-list li.error {
+    background-color: #481a1d;
+    color: #f8d7da;
+    border-color: #721c24;
 } 

@@ -9,27 +9,111 @@ if (!isset($_SESSION['authenticated']) || $_SESSION['authenticated'] !== true) {
     exit;
 }
 
-// File path for the favorites JSON file
-$favoritesFilePath = 'favorites.json';
+// API endpoints for favorites
+$getFavoritesApiEndpoint = 'https://n8n.ernilabs.com/webhook/getfavorites';
+$saveFavoritesApiEndpoint = 'https://n8n.ernilabs.com/webhook/savefavorites';
 
-// Function to get current favorites
+// Function to get current favorites from API
 function getFavorites() {
-    global $favoritesFilePath;
+    global $getFavoritesApiEndpoint;
     
-    if (file_exists($favoritesFilePath)) {
-        $favoritesJson = file_get_contents($favoritesFilePath);
-        return json_decode($favoritesJson, true);
+    // Initialize cURL session
+    $ch = curl_init($getFavoritesApiEndpoint);
+    
+    // Set cURL options
+    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+    
+    // Execute cURL session and get the response
+    $response = curl_exec($ch);
+    
+    // Check for errors
+    if(curl_errno($ch)) {
+        error_log('Error fetching favorites: ' . curl_error($ch));
+        return [];
     }
     
-    return [];
+    // Check HTTP response code
+    $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+    if ($httpCode >= 400) {
+        error_log('API returned error code: ' . $httpCode . ', Response: ' . $response);
+        return [];
+    }
+    
+    // Close cURL session
+    curl_close($ch);
+    
+    // Parse JSON response
+    $data = json_decode($response, true);
+    
+    // If JSON decoding failed
+    if (json_last_error() !== JSON_ERROR_NONE) {
+        error_log('JSON decode error: ' . json_last_error_msg());
+        return [];
+    }
+    
+    // Initialize empty favorites array
+    $favorites = [];
+    
+    // Handle the specific format from n8n
+    if (isset($data['favoriten'])) {
+        // The favoriten field is a JSON string, parse it
+        if (is_string($data['favoriten'])) {
+            $favorites = json_decode($data['favoriten'], true);
+            
+            // Check for JSON decode error
+            if (json_last_error() !== JSON_ERROR_NONE) {
+                error_log('Error decoding favoriten JSON string: ' . json_last_error_msg());
+                return [];
+            }
+        } 
+        // If it's already an array, use it directly
+        else if (is_array($data['favoriten'])) {
+            $favorites = $data['favoriten'];
+        }
+    }
+    
+    return is_array($favorites) ? $favorites : [];
 }
 
-// Function to save favorites
+// Function to save favorites to API
 function saveFavorites($favorites) {
-    global $favoritesFilePath;
+    global $saveFavoritesApiEndpoint;
     
-    $favoritesJson = json_encode($favorites, JSON_PRETTY_PRINT);
-    file_put_contents($favoritesFilePath, $favoritesJson);
+    // Encode the favorites array as JSON
+    $favoritesJson = json_encode($favorites);
+    
+    // Initialize cURL session
+    $ch = curl_init($saveFavoritesApiEndpoint);
+    
+    // Set cURL options
+    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+    curl_setopt($ch, CURLOPT_POST, true);
+    curl_setopt($ch, CURLOPT_POSTFIELDS, $favoritesJson);
+    curl_setopt($ch, CURLOPT_HTTPHEADER, [
+        'Content-Type: application/json',
+        'Content-Length: ' . strlen($favoritesJson)
+    ]);
+    
+    // Execute cURL session and get the response
+    $response = curl_exec($ch);
+    
+    // Check for errors
+    if(curl_errno($ch)) {
+        error_log('Error saving favorites: ' . curl_error($ch));
+        return false;
+    }
+    
+    // Check HTTP response code
+    $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+    if ($httpCode >= 400) {
+        error_log('API returned error code: ' . $httpCode . ', Response: ' . $response);
+        return false;
+    }
+    
+    // Close cURL session
+    curl_close($ch);
+    
+    return true;
 }
 
 // Handle form submission
@@ -69,8 +153,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             ];
             
             // Save favorites
-            saveFavorites($favorites);
-            $successMessage = 'New favorite question added successfully!';
+            $saveResult = saveFavorites($favorites);
+            if ($saveResult) {
+                $successMessage = 'New favorite question added successfully!';
+            } else {
+                $message = 'Error saving favorite. Please try again.';
+            }
         } else {
             $message = 'This question already exists in favorites.';
         }
@@ -92,8 +180,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $favorites = array_values($favorites);
         
         // Save favorites
-        saveFavorites($favorites);
-        $successMessage = 'Favorite question removed successfully!';
+        $saveResult = saveFavorites($favorites);
+        if ($saveResult) {
+            $successMessage = 'Favorite question removed successfully!';
+        } else {
+            $message = 'Error removing favorite. Please try again.';
+        }
     }
 }
 
@@ -217,6 +309,47 @@ $favorites = getFavorites();
             margin-top: 20px;
             display: inline-block;
         }
+        
+        .back-button {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            margin-top: 20px;
+            transition: background-color 0.2s;
+        }
+        
+        .back-button i {
+            margin-right: 8px;
+        }
+        
+        .back-button:hover {
+            background-color: #0069d9;
+            text-decoration: none;
+        }
+        
+        .loading {
+            display: none;
+            text-align: center;
+            margin: 20px 0;
+        }
+        
+        .loading i {
+            color: #007bff;
+            font-size: 24px;
+            animation: spin 1s infinite linear;
+        }
+        
+        @keyframes spin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
     </style>
 </head>
 <body>
@@ -241,6 +374,10 @@ $favorites = getFavorites();
         
         <div class="favorites-list">
             <h2>Current Favorite Questions</h2>
+            
+            <div class="loading">
+                <i class="fas fa-spinner"></i> Loading favorites...
+            </div>
             
             <?php if (empty($favorites)): ?>
                 <p>No favorite questions added yet.</p>
@@ -271,7 +408,23 @@ $favorites = getFavorites();
             <?php endif; ?>
         </div>
         
-        <a href="chat.php" class="back-link">← Back to Chat</a>
+        <a href="chat.php" class="back-button">
+            <i class="fas fa-arrow-left"></i> Back to Chat
+        </a>
     </div>
+    
+    <script>
+        // Show loading indicator during form submissions
+        document.addEventListener('DOMContentLoaded', function() {
+            const forms = document.querySelectorAll('form');
+            const loading = document.querySelector('.loading');
+            
+            forms.forEach(form => {
+                form.addEventListener('submit', function() {
+                    loading.style.display = 'block';
+                });
+            });
+        });
+    </script>
 </body>
 </html> 

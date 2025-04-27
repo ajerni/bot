@@ -62,7 +62,7 @@ if (!isset($_SESSION['authenticated']) || $_SESSION['authenticated'] !== true) {
             </div>
             <div class="modal-body">
                 <ul id="favorites-list">
-                    <!-- Favorite questions will be loaded here dynamically -->
+                    <!-- Favorites will be loaded here -->
                 </ul>
             </div>
         </div>
