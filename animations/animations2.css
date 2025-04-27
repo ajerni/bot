@@ -1,0 +1,121 @@
+/* Star animations and styles */
+.stars {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 0;
+    pointer-events: none;
+}
+
+.star {
+    position: absolute;
+    background-color: #fff;
+    border-radius: 50%;
+    z-index: 1;
+}
+
+.shining-star {
+    position: absolute;
+    color: white;
+    font-size: 20px;
+    z-index: 1;
+    opacity: 0.9;
+}
+
+.twinkle {
+    animation: twinkle 2s infinite;
+}
+
+@keyframes twinkle {
+    0% { opacity: 0.2; }
+    50% { opacity: 1; }
+    100% { opacity: 0.2; }
+}
+
+/* Planet Approach Transition Effect */
+.warp-transition {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 1000;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.warp-transition.active {
+    opacity: 1;
+}
+
+/* Planet surface that appears from bottom */
+.planet-surface {
+    position: fixed;
+    bottom: -100%;
+    left: 0;
+    width: 100%;
+    height: 70vh;
+    background: radial-gradient(ellipse at center, #1a3b5c 0%, #0c1d2e 100%);
+    border-top: 2px solid rgba(255, 255, 255, 0.3);
+    z-index: 1500;
+    transition: bottom 2s cubic-bezier(0.19, 1, 0.22, 1);
+}
+
+.planet-surface.active {
+    bottom: 0;
+}
+
+.flash {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(255, 255, 255, 0.2);
+    z-index: 2000;
+    opacity: 0;
+    pointer-events: none;
+}
+
+@keyframes starMove {
+    0% {
+        transform: translateY(0);
+    }
+    100% {
+        transform: translateY(100vh);
+    }
+}
+
+@keyframes flash {
+    0% { opacity: 0; }
+    50% { opacity: 0.3; }
+    100% { opacity: 0; }
+}
+
+.fade-out {
+    animation: fadeOut 0.5s forwards;
+}
+
+@keyframes fadeOut {
+    from { opacity: 1; }
+    to { opacity: 0; }
+}
+
+/* Planet approach effect for stars */
+.star.planet-approach, .shining-star.planet-approach {
+    animation: starMove 2.5s forwards;
+}
+
+/* Hide form on success to show animation better */
+.hidden {
+    opacity: 0;
+    transition: opacity 0.5s ease;
+}
+
+/* For instant hiding of login container */
+.instant-hide {
+    display: none;
+} 

@@ -27,7 +27,7 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
 
 // Authentication credentials - stored securely on the server
 // Replace these with your actual credentials
-$n8n_username = 'your_user';
+$n8n_username = 'your_username';
 $n8n_password = 'your_password';
 $n8n_webhook_url = 'your_n8n_webhook_url';
 

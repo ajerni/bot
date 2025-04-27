@@ -1,0 +1,143 @@
+/* Star animations and styles */
+.stars {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 0;
+    pointer-events: none;
+}
+
+.star {
+    position: absolute;
+    background-color: #fff;
+    border-radius: 50%;
+    z-index: 1;
+}
+
+.shining-star {
+    position: absolute;
+    color: white;
+    font-size: 20px;
+    z-index: 1;
+    opacity: 0.9;
+}
+
+.twinkle {
+    animation: twinkle 2s infinite;
+}
+
+@keyframes twinkle {
+    0% { opacity: 0.2; }
+    50% { opacity: 1; }
+    100% { opacity: 0.2; }
+}
+
+/* Nebula Formation Transition Effect */
+.warp-transition {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 1000;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.warp-transition.active {
+    opacity: 1;
+}
+
+/* Nebula cloud elements */
+.nebula-cloud {
+    position: absolute;
+    border-radius: 50%;
+    filter: blur(20px);
+    opacity: 0;
+    transition: all 2s ease;
+    background: radial-gradient(ellipse at center, rgba(var(--color-rgb), 0.8) 0%, rgba(var(--color-rgb), 0) 70%);
+}
+
+.nebula-cloud.active {
+    opacity: 0.7;
+    transform: scale(2);
+}
+
+.flash {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(255, 255, 255, 0.3);
+    z-index: 2000;
+    opacity: 0;
+    pointer-events: none;
+}
+
+@keyframes nebulaEffect {
+    0% {
+        transform: scale(1);
+        filter: blur(0px);
+        opacity: 1;
+    }
+    30% {
+        opacity: 0.8;
+    }
+    100% {
+        transform: scale(0.1);
+        filter: blur(20px);
+        opacity: 0;
+    }
+}
+
+@keyframes flash {
+    0% { opacity: 0; }
+    30% { opacity: 0.3; }
+    100% { opacity: 0; }
+}
+
+.fade-out {
+    animation: fadeOut 0.5s forwards;
+}
+
+@keyframes fadeOut {
+    from { opacity: 1; }
+    to { opacity: 0; }
+}
+
+/* Nebula formation effect for stars */
+.star.nebula-effect, .shining-star.nebula-effect {
+    animation: nebulaEffect 3s forwards;
+}
+
+/* Hide form on success to show animation better */
+.hidden {
+    opacity: 0;
+    transition: opacity 0.2s ease;
+}
+
+/* For instant hiding of login container */
+.instant-hide {
+    display: none;
+}
+
+/* Nebula clouds with different colors */
+.nebula-red {
+    --color-rgb: 255, 100, 100;
+}
+
+.nebula-blue {
+    --color-rgb: 100, 150, 255;
+}
+
+.nebula-purple {
+    --color-rgb: 180, 100, 255;
+}
+
+.nebula-teal {
+    --color-rgb: 100, 255, 200;
+} 
