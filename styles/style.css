@@ -592,4 +592,37 @@ body.dark-mode {
     background-color: #481a1d;
     color: #f8d7da;
     border-color: #721c24;
+}
+
+/* Context menu for adding to favorites */
+.message-context-menu {
+    position: absolute;
+    background-color: #fff;
+    border: 1px solid #ccc;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+    border-radius: 3px;
+    padding: 5px 0;
+    z-index: 1000;
+}
+
+.context-menu-item {
+    padding: 8px 12px;
+    cursor: pointer;
+    white-space: nowrap;
+    font-size: 14px;
+}
+
+.context-menu-item:hover {
+    background-color: #f0f0f0;
+}
+
+/* Dark mode for context menu */
+.dark-mode .message-context-menu {
+    background-color: #333;
+    border-color: #444;
+    color: #f8f8f8;
+}
+
+.dark-mode .context-menu-item:hover {
+    background-color: #444;
 } 

@@ -9,6 +9,10 @@ if (!isset($_SESSION['authenticated']) || $_SESSION['authenticated'] !== true) {
     exit;
 }
 
+// Debug POST data
+error_log('POST data: ' . print_r($_POST, true));
+error_log('REQUEST_METHOD: ' . $_SERVER['REQUEST_METHOD']);
+
 // API endpoints for favorites
 $getFavoritesApiEndpoint = 'https://n8n.ernilabs.com/webhook/getfavorites';
 $saveFavoritesApiEndpoint = 'https://n8n.ernilabs.com/webhook/savefavorites';
@@ -23,51 +27,45 @@ function getFavorites() {
     // Set cURL options
     curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
     
-    // Execute cURL session and get the response
+    // Execute the request
     $response = curl_exec($ch);
-    
-    // Check for errors
-    if(curl_errno($ch)) {
-        error_log('Error fetching favorites: ' . curl_error($ch));
-        return [];
-    }
-    
-    // Check HTTP response code
     $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-    if ($httpCode >= 400) {
-        error_log('API returned error code: ' . $httpCode . ', Response: ' . $response);
-        return [];
-    }
     
     // Close cURL session
     curl_close($ch);
     
-    // Parse JSON response
-    $data = json_decode($response, true);
+    // Log the response
+    error_log("getFavorites response code: $httpCode");
+    error_log("getFavorites raw response: $response");
     
-    // If JSON decoding failed
-    if (json_last_error() !== JSON_ERROR_NONE) {
-        error_log('JSON decode error: ' . json_last_error_msg());
+    // Check for successful response
+    if ($httpCode != 200) {
+        error_log("Error retrieving favorites: HTTP $httpCode");
         return [];
     }
     
-    // Initialize empty favorites array
+    // Parse the JSON response
+    $data = json_decode($response, true);
+    
+    // Check for JSON parsing error
+    if ($data === null && json_last_error() !== JSON_ERROR_NONE) {
+        error_log("JSON parsing error: " . json_last_error_msg());
+        return [];
+    }
+    
+    // Extract the favorites array from the response
     $favorites = [];
     
-    // Handle the specific format from n8n
     if (isset($data['favoriten'])) {
-        // The favoriten field is a JSON string, parse it
         if (is_string($data['favoriten'])) {
+            // If favoriten is a JSON string, parse it
             $favorites = json_decode($data['favoriten'], true);
-            
-            // Check for JSON decode error
-            if (json_last_error() !== JSON_ERROR_NONE) {
-                error_log('Error decoding favoriten JSON string: ' . json_last_error_msg());
+            if ($favorites === null) {
+                error_log("Error parsing favoriten JSON string");
                 return [];
             }
-        } 
-        // If it's already an array, use it directly
-        else if (is_array($data['favoriten'])) {
+        } elseif (is_array($data['favoriten'])) {
+            // If favoriten is already an array, use it directly
             $favorites = $data['favoriten'];
         }
     }
@@ -79,69 +77,75 @@ function getFavorites() {
 function saveFavorites($favorites) {
     global $saveFavoritesApiEndpoint;
     
-    // Encode the favorites array as JSON
-    $favoritesJson = json_encode($favorites);
+    // Ensure we have an array
+    if (!is_array($favorites)) {
+        error_log('Error: favorites is not an array');
+        return false;
+    }
     
-    // Initialize cURL session
+    // Convert the array to JSON
+    $jsonData = json_encode($favorites);
+    
+    // Simple debugging
+    error_log("Saving favorites to: $saveFavoritesApiEndpoint");
+    error_log("JSON data: $jsonData");
+    
+    // Use cURL to send the data
     $ch = curl_init($saveFavoritesApiEndpoint);
-    
-    // Set cURL options
     curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
     curl_setopt($ch, CURLOPT_POST, true);
-    curl_setopt($ch, CURLOPT_POSTFIELDS, $favoritesJson);
-    curl_setopt($ch, CURLOPT_HTTPHEADER, [
+    curl_setopt($ch, CURLOPT_POSTFIELDS, $jsonData);
+    curl_setopt($ch, CURLOPT_HTTPHEADER, array(
         'Content-Type: application/json',
-        'Content-Length: ' . strlen($favoritesJson)
-    ]);
+        'Content-Length: ' . strlen($jsonData)
+    ));
     
-    // Execute cURL session and get the response
+    // Execute the request
     $response = curl_exec($ch);
-    
-    // Check for errors
-    if(curl_errno($ch)) {
-        error_log('Error saving favorites: ' . curl_error($ch));
-        return false;
-    }
-    
-    // Check HTTP response code
     $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-    if ($httpCode >= 400) {
-        error_log('API returned error code: ' . $httpCode . ', Response: ' . $response);
-        return false;
-    }
+    
+    // Log the result
+    error_log("API Response Code: $httpCode");
+    error_log("API Response: $response");
     
     // Close cURL session
     curl_close($ch);
     
-    return true;
+    // Return success based on HTTP code
+    return ($httpCode >= 200 && $httpCode < 300);
 }
 
 // Handle form submission
 $message = '';
 $successMessage = '';
 
+// Check if form was submitted
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    // Get current favorites
-    $favorites = getFavorites();
+    error_log("POST request received: " . print_r($_POST, true));
     
-    // Add new favorite
+    // Handle adding a new favorite
     if (isset($_POST['add_favorite']) && !empty($_POST['question'])) {
         $newQuestion = trim($_POST['question']);
+        error_log("Adding new question: $newQuestion");
         
-        // Check if this question already exists
+        // Get current favorites
+        $favorites = getFavorites();
+        error_log("Current favorites: " . print_r($favorites, true));
+        
+        // Check if the question already exists
         $questionExists = false;
         foreach ($favorites as $favorite) {
-            if ($favorite['question'] === $newQuestion) {
+            if (isset($favorite['question']) && $favorite['question'] === $newQuestion) {
                 $questionExists = true;
                 break;
             }
         }
         
         if (!$questionExists) {
-            // Find the highest ID
+            // Find highest ID
             $maxId = 0;
             foreach ($favorites as $favorite) {
-                if ($favorite['id'] > $maxId) {
+                if (isset($favorite['id']) && $favorite['id'] > $maxId) {
                     $maxId = $favorite['id'];
                 }
             }
@@ -152,45 +156,60 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 'question' => $newQuestion
             ];
             
-            // Save favorites
-            $saveResult = saveFavorites($favorites);
-            if ($saveResult) {
-                $successMessage = 'New favorite question added successfully!';
+            // Save the updated favorites
+            if (saveFavorites($favorites)) {
+                $successMessage = "New favorite question added successfully!";
+                error_log("New favorite added successfully");
             } else {
-                $message = 'Error saving favorite. Please try again.';
+                $message = "Error saving favorite. Please try again.";
+                error_log("Failed to save favorites");
             }
         } else {
-            $message = 'This question already exists in favorites.';
+            $message = "This question already exists in favorites.";
+            error_log("Question already exists");
         }
     }
     
-    // Delete favorite
+    // Handle deleting a favorite
     if (isset($_POST['delete_favorite']) && isset($_POST['favorite_id'])) {
         $favoriteId = (int)$_POST['favorite_id'];
+        error_log("Deleting favorite with ID: $favoriteId");
+        
+        // Get current favorites
+        $favorites = getFavorites();
         
         // Find and remove the favorite
+        $found = false;
         foreach ($favorites as $key => $favorite) {
-            if ($favorite['id'] === $favoriteId) {
+            if (isset($favorite['id']) && $favorite['id'] === $favoriteId) {
                 unset($favorites[$key]);
+                $found = true;
                 break;
             }
         }
         
-        // Reindex array
-        $favorites = array_values($favorites);
-        
-        // Save favorites
-        $saveResult = saveFavorites($favorites);
-        if ($saveResult) {
-            $successMessage = 'Favorite question removed successfully!';
+        if ($found) {
+            // Reindex array
+            $favorites = array_values($favorites);
+            
+            // Save the updated favorites
+            if (saveFavorites($favorites)) {
+                $successMessage = "Favorite question removed successfully!";
+                error_log("Favorite removed successfully");
+            } else {
+                $message = "Error removing favorite. Please try again.";
+                error_log("Failed to save favorites after deletion");
+            }
         } else {
-            $message = 'Error removing favorite. Please try again.';
+            $message = "Favorite not found with ID: $favoriteId";
+            error_log("Favorite not found");
         }
     }
 }
 
 // Get current favorites for display
 $favorites = getFavorites();
+error_log('Favorites for display: ' . print_r($favorites, true));
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -364,12 +383,13 @@ $favorites = getFavorites();
             <div class="message success"><?= htmlspecialchars($successMessage) ?></div>
         <?php endif; ?>
         
-        <form method="post">
+        <form method="post" action="<?php echo htmlspecialchars($_SERVER['PHP_SELF']); ?>">
             <div class="form-group">
                 <label for="question">Add New Favorite Question:</label>
                 <input type="text" id="question" name="question" required>
             </div>
-            <button type="submit" name="add_favorite">Add Question</button>
+            <input type="hidden" name="add_favorite" value="1">
+            <button type="submit">Add Question</button>
         </form>
         
         <div class="favorites-list">
@@ -396,9 +416,10 @@ $favorites = getFavorites();
                                 <td><?= htmlspecialchars($favorite['id']) ?></td>
                                 <td><?= htmlspecialchars($favorite['question']) ?></td>
                                 <td>
-                                    <form method="post" style="display: inline;">
+                                    <form method="post" action="<?php echo htmlspecialchars($_SERVER['PHP_SELF']); ?>">
                                         <input type="hidden" name="favorite_id" value="<?= htmlspecialchars($favorite['id']) ?>">
-                                        <button type="submit" name="delete_favorite" class="delete-btn">Delete</button>
+                                        <input type="hidden" name="delete_favorite" value="1">
+                                        <button type="submit" class="delete-btn">Delete</button>
                                     </form>
                                 </td>
                             </tr>
@@ -414,14 +435,15 @@ $favorites = getFavorites();
     </div>
     
     <script>
-        // Show loading indicator during form submissions
+        // Basic logging of form submissions
         document.addEventListener('DOMContentLoaded', function() {
-            const forms = document.querySelectorAll('form');
-            const loading = document.querySelector('.loading');
+            console.log('Page loaded and ready');
             
-            forms.forEach(form => {
-                form.addEventListener('submit', function() {
-                    loading.style.display = 'block';
+            // Log form submissions
+            document.querySelectorAll('form').forEach(function(form) {
+                form.addEventListener('submit', function(e) {
+                    console.log('Form submitting...');
+                    document.querySelector('.loading').style.display = 'block';
                 });
             });
         });
