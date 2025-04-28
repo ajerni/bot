@@ -57,69 +57,8 @@ function createStars() {
     }
 }
 
-// Initialize warp transition
+// Initialize nebula clouds for transition
 function initWarpTransition() {
-    // Get the href of the linked stylesheet to determine which animation to use
-    const stylesheets = document.querySelectorAll('link[rel="stylesheet"]');
-    let animationType = 'default';
-    
-    for (const sheet of stylesheets) {
-        if (sheet.href.includes('animations')) {
-            if (sheet.href.includes('animations1')) animationType = 'blackhole';
-            if (sheet.href.includes('animations2')) animationType = 'planet';
-            if (sheet.href.includes('animations3')) animationType = 'galaxy';
-            if (sheet.href.includes('animations4')) animationType = 'nebula';
-            if (sheet.href.includes('animations5')) animationType = 'teleport';
-            break;
-        }
-    }
-    
-    // Initialize based on animation type
-    switch (animationType) {
-        case 'nebula':
-            initNebulaClouds();
-            break;
-        case 'galaxy':
-            initGalaxyCenter();
-            break;
-        case 'planet':
-            initPlanetSurface();
-            break;
-        case 'teleport':
-            initTeleportBeam();
-            break;
-        default:
-            initDefaultWarp();
-            break;
-    }
-}
-
-// Initialize default warp stars
-function initDefaultWarp() {
-    const warpTransition = document.getElementById('warp-transition');
-    const numLines = 100;
-    
-    for (let i = 0; i < numLines; i++) {
-        const line = document.createElement('div');
-        line.className = 'warp-star';
-        
-        // Random position
-        const y = Math.random() * 100;
-        const width = Math.random() * 50 + 10;
-        const delay = Math.random() * 0.5;
-        
-        line.style.top = `${y}%`;
-        line.style.left = `${Math.random() * 30}%`;
-        line.style.width = `${width}px`;
-        line.style.opacity = Math.random() * 0.7 + 0.3;
-        line.style.transitionDelay = `${delay}s`;
-        
-        warpTransition.appendChild(line);
-    }
-}
-
-// Initialize nebula clouds
-function initNebulaClouds() {
     const warpTransition = document.getElementById('warp-transition');
     const colors = ['nebula-red', 'nebula-blue', 'nebula-purple', 'nebula-teal'];
     const numClouds = 8;
@@ -142,155 +81,73 @@ function initNebulaClouds() {
     }
 }
 
-// Initialize galaxy center
-function initGalaxyCenter() {
-    const warpTransition = document.getElementById('warp-transition');
-    const center = document.createElement('div');
-    center.className = 'galaxy-center';
-    warpTransition.appendChild(center);
-}
-
-// Initialize planet surface
-function initPlanetSurface() {
-    const warpTransition = document.getElementById('warp-transition');
-    const surface = document.createElement('div');
-    surface.className = 'planet-surface';
-    warpTransition.appendChild(surface);
-}
-
-// Initialize teleport beam
-function initTeleportBeam() {
-    const warpTransition = document.getElementById('warp-transition');
-    const beam = document.createElement('div');
-    beam.className = 'teleport-beam';
-    warpTransition.appendChild(beam);
-    
-    // Add particles
-    const particles = document.createElement('div');
-    particles.className = 'particles';
-    
-    for (let i = 0; i < 50; i++) {
-        const particle = document.createElement('div');
-        particle.className = 'particle';
-        particle.style.left = `${Math.random() * 100}%`;
-        particles.appendChild(particle);
-    }
-    
-    warpTransition.appendChild(particles);
-}
-
 // Activate warp transition effect
 function activateWarpEffect() {
+    // Lock scrolling and mark body for transition
+    document.body.classList.add('transition-active');
+    document.body.style.overflow = 'hidden';
+    
+    // Get elements
     const content = document.getElementById('content');
     const warpTransition = document.getElementById('warp-transition');
     const flash = document.getElementById('flash');
     const stars = document.querySelectorAll('.star, .shining-star');
+    const loginContainer = document.getElementById('login-container');
+    const title = document.querySelector('.title');
     
-    // Get the animation type
-    const stylesheets = document.querySelectorAll('link[rel="stylesheet"]');
-    let animationType = 'default';
+    // Take a snapshot of current positions
+    const contentRect = content.getBoundingClientRect();
     
-    for (const sheet of stylesheets) {
-        if (sheet.href.includes('animations')) {
-            if (sheet.href.includes('animations1')) animationType = 'blackhole';
-            if (sheet.href.includes('animations2')) animationType = 'planet';
-            if (sheet.href.includes('animations3')) animationType = 'galaxy';
-            if (sheet.href.includes('animations4')) animationType = 'nebula';
-            if (sheet.href.includes('animations5')) animationType = 'teleport';
-            break;
-        }
+    // Fix title position if it exists
+    if (title) {
+        const titleRect = title.getBoundingClientRect();
+        title.style.position = 'fixed';
+        title.style.top = `${titleRect.top}px`;
+        title.style.left = `${titleRect.left}px`;
+        title.style.width = `${titleRect.width}px`;
+        title.style.height = `${titleRect.height}px`;
+        title.style.margin = '0';
+        title.style.transform = 'none';
+        title.classList.add('fade-out');
     }
     
-    // Hide content with fade
+    // Fix login container position if it exists
+    if (loginContainer) {
+        const rect = loginContainer.getBoundingClientRect();
+        loginContainer.style.position = 'fixed';
+        loginContainer.style.top = `${rect.top}px`;
+        loginContainer.style.left = `${rect.left}px`;
+        loginContainer.style.width = `${rect.width}px`;
+        loginContainer.style.height = `${rect.height}px`;
+        loginContainer.style.margin = '0';
+        loginContainer.style.transform = 'none';
+        loginContainer.classList.add('submitting');
+    }
+    
+    // Fix content position
+    content.style.position = 'fixed';
+    content.style.top = `${contentRect.top}px`;
+    content.style.left = `${contentRect.left}px`;
+    content.style.width = `${contentRect.width}px`;
+    content.style.height = `${contentRect.height}px`;
+    content.style.margin = '0';
+    content.style.transform = 'none';
     content.classList.add('fade-out');
     
     // Activate warp transition
     warpTransition.classList.add('active');
     
-    // Apply specific animation based on type
-    switch (animationType) {
-        case 'blackhole':
-            // Set coordinates for black hole effect
-            stars.forEach(star => {
-                const rect = star.getBoundingClientRect();
-                star.style.setProperty('--x-pos', `${rect.left}px`);
-                star.style.setProperty('--y-pos', `${rect.top}px`);
-                star.classList.add('black-hole-effect');
-            });
-            break;
-        case 'planet':
-            // Move stars down for planet approach
-            stars.forEach(star => {
-                star.classList.add('planet-approach');
-            });
-            // Activate planet surface
-            setTimeout(() => {
-                document.querySelector('.planet-surface').classList.add('active');
-            }, 500);
-            break;
-        case 'galaxy':
-            // Rotate stars for galaxy spin
-            stars.forEach(star => {
-                const rect = star.getBoundingClientRect();
-                star.style.setProperty('--x-pos', `${rect.left}px`);
-                star.style.setProperty('--y-pos', `${rect.top}px`);
-                star.classList.add('galaxy-spin');
-            });
-            // Activate galaxy center
-            setTimeout(() => {
-                document.querySelector('.galaxy-center').classList.add('active');
-            }, 300);
-            break;
-        case 'nebula':
-            // Transform stars into nebula
-            stars.forEach(star => {
-                star.classList.add('nebula-effect');
-            });
-            // Activate nebula clouds
-            setTimeout(() => {
-                document.querySelectorAll('.nebula-cloud').forEach(cloud => {
-                    cloud.classList.add('active');
-                });
-            }, 1000);
-            break;
-        case 'teleport':
-            // Attract stars to beam
-            stars.forEach(star => {
-                const rect = star.getBoundingClientRect();
-                star.style.setProperty('--x-pos', `${rect.left}px`);
-                star.classList.add('beam-effect');
-            });
-            // Activate teleport beam
-            setTimeout(() => {
-                document.querySelector('.teleport-beam').classList.add('active');
-                // Activate particles
-                setTimeout(() => {
-                    document.querySelectorAll('.particle').forEach((particle, i) => {
-                        setTimeout(() => {
-                            particle.classList.add('active');
-                        }, Math.random() * 1000);
-                    });
-                }, 500);
-            }, 300);
-            break;
-        default:
-            // Default star warp
-            const warpStars = document.querySelectorAll('.warp-star');
-            warpStars.forEach(star => {
-                setTimeout(() => {
-                    star.style.transform = `scaleX(${20 + Math.random() * 30}) translateX(${window.innerWidth}px)`;
-                    star.style.opacity = '0';
-                }, Math.random() * 200);
-            });
-            
-            // Hide regular stars
-            stars.forEach(star => {
-                star.style.animation = 'none';
-                star.style.opacity = '0';
-                star.style.transition = 'opacity 1s ease';
-            });
-            break;
-    }
+    // Transform stars into nebula
+    stars.forEach(star => {
+        star.classList.add('nebula-effect');
+    });
+    
+    // Activate nebula clouds
+    setTimeout(() => {
+        document.querySelectorAll('.nebula-cloud').forEach(cloud => {
+            cloud.classList.add('active');
+        });
+    }, 1000);
     
     // Flash effect
     setTimeout(() => {

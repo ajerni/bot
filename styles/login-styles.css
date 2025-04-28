@@ -26,6 +26,9 @@ body {
     padding: 20px;
     position: relative;
     min-height: 100vh;
+    transition: opacity 0.5s ease;
+    transform: none !important; /* Prevent any unwanted transforms */
+    text-align: center; /* Keep all inner content centered */
 }
 
 .title {
@@ -43,6 +46,8 @@ body {
     position: absolute;
     top: 25%;
     transform: translateY(-50%);
+    transition: opacity 0.5s ease;
+    transform-style: preserve-3d;
 }
 
 /* Media queries for responsive title size */
@@ -70,6 +75,16 @@ body {
     text-align: center;
     box-shadow: 0 0 20px rgba(255, 255, 255, 0.1);
     backdrop-filter: blur(5px);
+    transition: opacity 0.5s ease;
+    transform: none !important; /* Prevent unwanted transforms */
+}
+
+.login-container.submitting {
+    position: fixed !important;
+    top: 50% !important;
+    left: 50% !important;
+    transform: translate(-50%, -50%) !important;
+    margin: 0 !important;
 }
 
 h1 {

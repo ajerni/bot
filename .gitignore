@@ -1,7 +1,23 @@
 # Ignore sensitive configuration
 proxy.php
-index.php
+private/config/config.php
 
 # Ignore environment files
 .env
 *.env
+
+# Ignore IDE and system files
+.DS_Store
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# Ignore logs and temporary files
+*.log
+tmp/
+temp/
+
+# Ignore session files
+sessions/
+*.sess

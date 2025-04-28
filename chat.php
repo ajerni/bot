@@ -1,13 +1,19 @@
 <?php
-// Start session
-session_start();
+// Include security functions
+require_once 'includes/security.php';
 
-// Check if user is authenticated
-if (!isset($_SESSION['authenticated']) || $_SESSION['authenticated'] !== true) {
-    // Redirect to login page if not authenticated
-    header("Location: index.php");
+// Initialize security
+initSecurity();
+
+// Check authentication and session timeout
+if (!isset($_SESSION['authenticated']) || !checkSessionTimeout()) {
+    // Not authenticated or session expired, redirect to login
+    header('Location: index.php');
     exit;
 }
+
+// Update last activity
+$_SESSION['last_activity'] = time();
 ?>
 <!DOCTYPE html>
 <html lang="en">

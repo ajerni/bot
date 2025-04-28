@@ -100,8 +100,17 @@
     100% { opacity: 0; }
 }
 
+/* Lock elements during transition to prevent movement */
+body.transition-active {
+    overflow: hidden !important;
+}
+
 .fade-out {
     animation: fadeOut 0.5s forwards;
+    position: fixed !important;
+    transform: none !important;
+    margin: 0 !important;
+    transition: opacity 0.5s ease;
 }
 
 @keyframes fadeOut {
@@ -140,4 +149,15 @@
 
 .nebula-teal {
     --color-rgb: 100, 255, 200;
+}
+
+/* Ensure login container doesn't move during animations */
+.login-container.submitting {
+    position: fixed !important;
+    transition: opacity 0.5s ease;
+    opacity: 0 !important;
+    z-index: 100;
+    animation: fadeOut 0.5s forwards;
+    transform: none !important;
+    margin: 0 !important;
 } 
