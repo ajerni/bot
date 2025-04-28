@@ -134,30 +134,30 @@ function activateWarpEffect() {
     content.style.transform = 'none';
     content.classList.add('fade-out');
     
-    // Activate warp transition
+    // Activate warp transition and show nebula clouds immediately
     warpTransition.classList.add('active');
-    
-    // Transform stars into nebula
-    stars.forEach(star => {
-        star.classList.add('nebula-effect');
+
+    document.querySelectorAll('.nebula-cloud').forEach(cloud => {
+        cloud.classList.add('active');
     });
     
-    // Activate nebula clouds
-    setTimeout(() => {
-        document.querySelectorAll('.nebula-cloud').forEach(cloud => {
-            cloud.classList.add('active');
-        });
-    }, 1000);
+    // Hide stars container completely instead of fading individual stars
+    const starsContainer = document.getElementById('stars');
+    if (starsContainer) {
+        // Use simple opacity transition
+        starsContainer.style.transition = 'opacity 1s ease';
+        starsContainer.style.opacity = '0';
+    }
     
-    // Flash effect
+    // Flash effect happens earlier in the animation
     setTimeout(() => {
-        flash.style.animation = 'flash 1.5s forwards';
+        flash.classList.add('active');
         
-        // Redirect after animation
+        // Redirect after animation completes
         setTimeout(() => {
             window.location.href = 'chat.php';
         }, 1500);
-    }, 1200);
+    }, 1500);  // Reduced from 2200ms to 1500ms
 }
 
 // Initialize on page load

@@ -59,6 +59,7 @@
     opacity: 0;
     transition: all 2s ease;
     background: radial-gradient(ellipse at center, rgba(var(--color-rgb), 0.8) 0%, rgba(var(--color-rgb), 0) 70%);
+    z-index: 1001;
 }
 
 .nebula-cloud.active {
@@ -72,32 +73,30 @@
     left: 0;
     width: 100%;
     height: 100%;
-    background-color: rgba(255, 255, 255, 0.3);
+    background-color: rgba(255, 255, 255, 0); /* Initially transparent */
     z-index: 2000;
     opacity: 0;
     pointer-events: none;
+    mix-blend-mode: screen; /* Make it blend better with colors */
 }
 
-@keyframes nebulaEffect {
-    0% {
-        transform: scale(1);
-        filter: blur(0px);
-        opacity: 1;
-    }
-    30% {
-        opacity: 0.8;
-    }
-    100% {
-        transform: scale(0.1);
-        filter: blur(20px);
+.flash.active {
+    animation: coloredFlash 1.5s forwards;
+}
+
+@keyframes coloredFlash {
+    0% { 
         opacity: 0;
+        background-color: rgba(255, 255, 255, 0);
     }
-}
-
-@keyframes flash {
-    0% { opacity: 0; }
-    30% { opacity: 0.3; }
-    100% { opacity: 0; }
+    30% { 
+        opacity: 0.7;
+        background-color: rgba(200, 200, 255, 0.4); /* More blue tint */
+    }
+    100% { 
+        opacity: 0;
+        background-color: rgba(255, 255, 255, 0);
+    }
 }
 
 /* Lock elements during transition to prevent movement */
@@ -116,11 +115,6 @@ body.transition-active {
 @keyframes fadeOut {
     from { opacity: 1; }
     to { opacity: 0; }
-}
-
-/* Nebula formation effect for stars */
-.star.nebula-effect, .shining-star.nebula-effect {
-    animation: nebulaEffect 3s forwards;
 }
 
 /* Hide form on success to show animation better */
@@ -160,4 +154,136 @@ body.transition-active {
     animation: fadeOut 0.5s forwards;
     transform: none !important;
     margin: 0 !important;
+}
+
+/* Access Denied Animation */
+.access-denied-container {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.85);
+    z-index: 5000;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s ease;
+}
+
+.access-denied-container.show {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+.access-denied-message {
+    font-family: monospace, 'Courier New', Courier;
+    color: #ff0000;
+    font-size: 5rem;
+    font-weight: bold;
+    text-transform: uppercase;
+    letter-spacing: 0.5rem;
+    text-shadow: 0 0 30px rgba(255, 0, 0, 0.9);
+    padding: 3rem;
+    border: 3px solid #ff0000;
+    background-color: rgba(0, 0, 0, 0.7);
+    animation: glitchEffect 0.5s infinite alternate, pulseEffect 1s infinite;
+    position: relative;
+    overflow: hidden;
+    transform: scale(1.2);
+}
+
+.access-denied-message::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 5px;
+    background-color: rgba(255, 0, 0, 0.7);
+    animation: scanline 2s linear infinite;
+}
+
+@keyframes glitchEffect {
+    0%, 5%, 10% {
+        transform: translate(0);
+        text-shadow: 0 0 20px rgba(255, 0, 0, 0.7);
+    }
+    1% {
+        transform: translate(-3px, 1px);
+        text-shadow: -3px 0 5px rgba(255, 0, 0, 0.7);
+    }
+    6% {
+        transform: translate(3px, -1px);
+        text-shadow: 3px 0 5px rgba(255, 0, 0, 0.7);
+    }
+}
+
+@keyframes pulseEffect {
+    0%, 100% {
+        box-shadow: 0 0 20px rgba(255, 0, 0, 0.7);
+    }
+    50% {
+        box-shadow: 0 0 40px rgba(255, 0, 0, 0.9);
+    }
+}
+
+@keyframes scanline {
+    0% {
+        left: -100%;
+    }
+    100% {
+        left: 100%;
+    }
+}
+
+.access-denied-container.show .access-denied-message {
+    animation: glitchEffect 1s infinite alternate, pulseEffect 2s infinite, appearEffect 0.3s ease-out;
+}
+
+@keyframes appearEffect {
+    0% {
+        transform: scale(0.8);
+        opacity: 0;
+    }
+    50% {
+        transform: scale(1.1);
+    }
+    100% {
+        transform: scale(1);
+        opacity: 1;
+    }
+}
+
+/* Glitch pixels that appear briefly */
+.glitch-pixels {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    top: 0;
+    left: 0;
+    pointer-events: none;
+    z-index: 1900;
+    opacity: 0;
+}
+
+.glitch-pixels.active {
+    opacity: 1;
+    animation: pixelFlash 0.3s forwards;
+}
+
+.glitch-pixel {
+    position: absolute;
+    background-color: #ff0000;
+    opacity: 0.7;
+}
+
+@keyframes pixelFlash {
+    0%, 100% { opacity: 0; }
+    10%, 30%, 50% { opacity: 0.8; }
+    15%, 45% { opacity: 0; }
+    60% { opacity: 0.4; }
+    80% { opacity: 0; }
 } 
