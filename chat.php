@@ -41,6 +41,9 @@ $_SESSION['last_activity'] = time();
                 <i class="fas fa-moon"></i>
             </button>
             Andi's Bot
+            <a href="logout.php" id="logout-btn" class="logout-btn" title="Logout">
+                <i class="fas fa-sign-out-alt"></i>
+            </a>
             <button id="fullscreen-btn" class="fullscreen-btn" title="Toggle fullscreen">
                 <i class="fas fa-expand"></i>
             </button>

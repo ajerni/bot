@@ -20,11 +20,7 @@ $error_message = "";
 
 // Check if form has been submitted
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    // Debug output
-    var_dump('Posted password:', $_POST['password'] ?? null);
-    var_dump('Config hash:', $config['password_hash'] ?? null);
-    var_dump('password_verify:', isset($_POST['password']) ? password_verify($_POST['password'], $config['password_hash']) : null);
-    // Re-enable CSRF check
+    // CSRF check
     if (!isset($_POST['csrf_token']) || !validateCSRFToken($_POST['csrf_token'])) {
         $error_message = "Invalid request. Please try again.";
     }
